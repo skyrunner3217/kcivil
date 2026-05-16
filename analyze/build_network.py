@@ -36,7 +36,7 @@ OUT_DIR = ROOT / "network"
 
 def load_papers() -> list[dict]:
     papers = []
-    for source in ("journal", "conference"):
+    for source in ("journal", "conference", "conference_ksmi"):
         meta_dir = META_DIR / source
         if not meta_dir.exists():
             continue

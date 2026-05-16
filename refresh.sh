@@ -33,7 +33,7 @@ net  = "network"
 os.makedirs(net, exist_ok=True)
 
 papers = []
-for src in ["journal", "conference"]:
+for src in ["journal", "conference", "conference_ksmi"]:
     for f in sorted(glob.glob(f"{base}/{src}/*.json")):
         try:
             with open(f) as fp: papers.append(json.load(fp))
