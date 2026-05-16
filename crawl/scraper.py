@@ -36,15 +36,30 @@ BASE_URL = "https://paper.cricit.kr/user/listview/kci2018"
 SOURCES: dict[str, dict] = {
     "journal": {
         "organCode2": "kci01",
+        "organCode": "kci",
+        "base_url": "https://paper.cricit.kr/user/listview/kci2018",
+        "society": "KCI",
         "label": "콘크리트학회논문집",
         "months": ["02", "04", "06", "08", "10", "12"],
         "start_year": 1989,
     },
     "conference": {
         "organCode2": "kci03",
+        "organCode": "kci",
+        "base_url": "https://paper.cricit.kr/user/listview/kci2018",
+        "society": "KCI",
         "label": "학술대회논문집",
         "months": ["04", "05", "06", "10", "11", "12"],
         "start_year": 1989,
+    },
+    "conference_ksmi": {
+        "organCode2": "ksm01",
+        "organCode": "ksm",
+        "base_url": "https://www.auric.or.kr/user/listview/ksmi",
+        "society": "KSMI",
+        "label": "KSMI 학술발표회 논문집",
+        "months": ["04", "05", "10", "11"],
+        "start_year": 1997,
     },
 }
 
@@ -106,7 +121,8 @@ class Keywords:
 @dataclass
 class Paper:
     dn: str = ""
-    source: str = ""          # "journal" | "conference"
+    source: str = ""          # "journal" | "conference" | "conference_ksmi"
+    society: str = "KCI"      # "KCI" | "KSMI"
     organCode2: str = ""
     yearmonth: str = ""
     year: str = ""
@@ -124,6 +140,9 @@ class Paper:
     issue: str = ""
     page: str = ""
     issn: str = ""
+
+    session_info: str = ""        # KSMI: "1분과. 건설안전 및 관리 구두발표"
+    presentation_type: str = ""   # "oral" | "poster" | "" (감지 불가 시 빈 문자열)
 
     listing_url: str = ""
     detail_url: str = ""
@@ -222,10 +241,13 @@ def polite_delay() -> None:
 
 # ── 목록 페이지 파싱 ──────────────────────────────────────────────────────────
 
-def make_listing_url(organCode2: str, yearmonth: str, page: int = 1) -> str:
+def make_listing_url(
+    organCode2: str, yearmonth: str, page: int = 1,
+    base_url: str = BASE_URL, organCode: str = "kci"
+) -> str:
     url = (
-        f"{BASE_URL}/gby_rdoc.asp"
-        f"?step=4&organCode=kci&organCode2={organCode2}"
+        f"{base_url}/gby_rdoc.asp"
+        f"?step=4&organCode={organCode}&organCode2={organCode2}"
         f"&yearmonth={yearmonth}&usernum=0&seid=&tbnm=r"
     )
     if page > 1:
@@ -233,10 +255,13 @@ def make_listing_url(organCode2: str, yearmonth: str, page: int = 1) -> str:
     return url
 
 
-def make_detail_url(dn: str, organCode2: str, yearmonth: str) -> str:
+def make_detail_url(
+    dn: str, organCode2: str, yearmonth: str,
+    base_url: str = BASE_URL, organCode: str = "kci"
+) -> str:
     return (
-        f"{BASE_URL}/doc_rdoc.asp"
-        f"?catvalue=3&returnVal=RD_R&organCode=kci&organCode2={organCode2}"
+        f"{base_url}/doc_rdoc.asp"
+        f"?catvalue=3&returnVal=RD_R&organCode={organCode}&organCode2={organCode2}"
         f"&yearmonth={yearmonth}&page=1&dn={dn}&step=&usernum=0&seid="
     )
 
@@ -318,13 +343,16 @@ def _parse_total_pages(soup: BeautifulSoup) -> int:
     return int(m.group(1)) if m else 1
 
 
-def scrape_issue_listing(organCode2: str, yearmonth: str) -> list[ListingEntry]:
+def scrape_issue_listing(
+    organCode2: str, yearmonth: str,
+    base_url: str = BASE_URL, organCode: str = "kci"
+) -> list[ListingEntry]:
     """
     특정 권호의 논문 목록 수집 (전체 페이지 순회)
     반환: [(dn, title_ko, page), ...]
     """
     # ── 1페이지 ──────────────────────────────────────────────────────────────
-    url = make_listing_url(organCode2, yearmonth, page=1)
+    url = make_listing_url(organCode2, yearmonth, page=1, base_url=base_url, organCode=organCode)
     soup = get_page(url)
     if soup is None:
         return []
@@ -339,7 +367,7 @@ def scrape_issue_listing(organCode2: str, yearmonth: str) -> list[ListingEntry]:
     # ── 2~N 페이지 ────────────────────────────────────────────────────────────
     for p in range(2, total_pages + 1):
         time.sleep(random.uniform(DELAY_MIN, DELAY_MAX))
-        p_url = make_listing_url(organCode2, yearmonth, page=p)
+        p_url = make_listing_url(organCode2, yearmonth, page=p, base_url=base_url, organCode=organCode)
         p_soup = get_page(p_url)
         if p_soup is None:
             log.warning(f"    목록 {yearmonth} p.{p} 수집 실패 — 이후 페이지 중단")
@@ -388,6 +416,8 @@ def scrape_paper_detail(
         "issue": "",
         "page": "",
         "issn": "",
+        "session_info": "",
+        "presentation_type": "",
     }
 
     if soup is None:
@@ -403,11 +433,22 @@ def scrape_paper_detail(
         sibling = title_el.find_next_sibling("td")
         if sibling:
             raw_title = clean_text(sibling.get_text())
-            # "한국어 제목/English Title" 형식 분리
-            sep = re.search(r"^(.+?)\s*/\s*([A-Z].+)$", raw_title)
-            if sep:
-                result["title_ko"] = sep.group(1).strip() or fallback_title
-                result["title_en"] = sep.group(2).strip()
+            # KCI: "한국어 제목/English Title" (우측이 대문자 영문)
+            sep_en = re.search(r"^(.+?)\s*/\s*([A-Z].+)$", raw_title)
+            # KSMI: "논문제목/N분과. 구두발표" (우측이 한글 세션 정보)
+            sep_session = re.search(r"^(.+?)\s*/\s*(\d+분과.+|포스터.+|구두.+)$", raw_title)
+            if sep_en:
+                result["title_ko"] = sep_en.group(1).strip() or fallback_title
+                result["title_en"] = sep_en.group(2).strip()
+            elif sep_session:
+                result["title_ko"] = sep_session.group(1).strip() or fallback_title
+                session_raw = sep_session.group(2).strip()
+                result["session_info"] = session_raw
+                # 구두/포스터 감지
+                if re.search(r"구두", session_raw):
+                    result["presentation_type"] = "oral"
+                elif re.search(r"포스터", session_raw):
+                    result["presentation_type"] = "poster"
             else:
                 result["title_ko"] = raw_title or fallback_title
 
@@ -485,9 +526,9 @@ def scrape_paper_detail(
         val = clean_text(td.get_text())
 
         if re.search(r"수록사항", label):
-            # "Vol.19 No.6" 형식에서 권호 추출
-            vol_m = re.search(r"Vol\.?\s*(\d+)", val, re.I)
-            no_m  = re.search(r"No\.?\s*(\d+)", val, re.I)
+            # KCI: "Vol.19 No.6" / KSMI: "v.27 n.1"
+            vol_m = re.search(r"[Vv]ol?\.?\s*(\d+)", val)
+            no_m  = re.search(r"[Nn]o?\.?\s*(\d+)", val)
             if vol_m:
                 result["volume"] = vol_m.group(1)
             if no_m:
@@ -653,6 +694,9 @@ def scrape_source(
     """
     cfg = SOURCES[source]
     organCode2 = cfg["organCode2"]
+    organCode  = cfg.get("organCode", "kci")
+    base_url   = cfg.get("base_url", BASE_URL)
+    society    = cfg.get("society", "KCI")
     label = cfg["label"]
 
     yearmonths = generate_yearmonths(source, start_year, end_year)
@@ -674,10 +718,10 @@ def scrape_source(
             continue
 
         log.info(f"\n  [{ym_idx}/{len(yearmonths)}] {year}년 {month}월호 수집 중...")
-        listing_url = make_listing_url(organCode2, yearmonth)
+        listing_url = make_listing_url(organCode2, yearmonth, base_url=base_url, organCode=organCode)
 
         # 목록 수집
-        entries = scrape_issue_listing(organCode2, yearmonth)
+        entries = scrape_issue_listing(organCode2, yearmonth, base_url=base_url, organCode=organCode)
 
         if not entries:
             log.info(f"    → 논문 없음 (빈 권호)")
@@ -708,6 +752,7 @@ def scrape_source(
             paper = Paper(
                 dn=dn,
                 source=source,
+                society=society,
                 organCode2=organCode2,
                 yearmonth=yearmonth,
                 year=year,
@@ -728,8 +773,10 @@ def scrape_source(
                 page=entry.page or detail.get("page", ""),
                 issn=detail.get("issn", ""),
                 affiliation=detail.get("affiliation", ""),
+                session_info=detail.get("session_info", ""),
+                presentation_type=detail.get("presentation_type", ""),
                 listing_url=listing_url,
-                detail_url=make_detail_url(dn, organCode2, yearmonth),
+                detail_url=make_detail_url(dn, organCode2, yearmonth, base_url=base_url, organCode=organCode),
                 scraped_at=datetime.now().isoformat(),
             )
 
@@ -768,9 +815,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="KCI 콘크리트학회 논문 메타데이터 수집기")
     parser.add_argument(
         "--source",
-        choices=["journal", "conference", "both"],
+        choices=["journal", "conference", "conference_ksmi", "both"],
         default="both",
-        help="수집 대상 (기본: both)",
+        help="수집 대상 (기본: both = journal + conference)",
     )
     parser.add_argument(
         "--years",
@@ -799,7 +846,8 @@ def main() -> None:
         log.info("진행 상태 초기화")
 
     sources_to_run = (
-        ["journal", "conference"] if args.source == "both" else [args.source]
+        ["journal", "conference"] if args.source == "both"
+        else [args.source]
     )
 
     print("\n" + "="*55)
