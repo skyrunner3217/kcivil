@@ -61,6 +61,15 @@ SOURCES: dict[str, dict] = {
         "months": ["04", "05", "10", "11"],
         "start_year": 1997,
     },
+    "journal_ksmi": {
+        "organCode2": "ksm01",
+        "organCode": "ksm",
+        "base_url": "https://www.auric.or.kr/user/listview/ksmi",
+        "society": "KSMI",
+        "label": "KSMI 국문논문집(JKSMI)",
+        "months": ["02", "04", "06", "08", "10", "12"],
+        "start_year": 1997,
+    },
 }
 
 ROOT = Path(__file__).parent.parent
@@ -508,7 +517,7 @@ def scrape_paper_detail(
     # 실제 th 레이블: "논문명" — KO/EN이 "/" 로 연결된 경우 분리
     # 예: "하수슬러지...특성/Properties of Eco-Construction..."
     title_el = soup.find(
-        "th", string=re.compile(r"논문명|제\s*목|논문\s*제목|Title.*KO|한국어\s*제목", re.I)
+        "th", string=re.compile(r"논문명|기사명|제\s*목|논문\s*제목|Title.*KO|한국어\s*제목", re.I)
     )
     if title_el:
         sibling = title_el.find_next_sibling("td")
@@ -763,6 +772,139 @@ def generate_yearmonths(
     return yearmonths
 
 
+def make_ksmi_journal_listing_url(yearmonth: str, page: int = 1) -> str:
+    base = (
+        "https://www.auric.or.kr/user/listview/ksmi/gby_cmag.asp"
+        f"?step=4&organCode=ksm&organCode2=ksm01&usernum=0&seid=&dbcode=&yearmonth={yearmonth}"
+    )
+    if page > 1:
+        base += f"&page={page}&spage={page}"
+    return base
+
+
+def make_ksmi_journal_detail_url(dn: str, yearmonth: str) -> str:
+    return (
+        "https://www.auric.or.kr/user/listview/ksmi/doc_rdoc.asp"
+        f"?step=4&organCode2=ksm01&yearmonth={yearmonth}&returnVal=CMAG&page=1&dn={dn}&usernum=0&seid="
+    )
+
+
+def scrape_ksmi_journal_source(
+    start_year: int,
+    end_year: int,
+    progress: dict,
+) -> tuple[int, int]:
+    """KSMI 국문논문집 수집 (격월 권호별 순회, year/month 필터 작동)."""
+    source = "journal_ksmi"
+    cfg = SOURCES[source]
+    organCode2 = cfg["organCode2"]
+    society = cfg["society"]
+    yearmonths = generate_yearmonths(source, start_year, end_year)
+
+    log.info("\n" + "="*60)
+    log.info(f"[{cfg['label']}] {start_year}~{end_year}년, {len(yearmonths)}개 권호 대상")
+    log.info("="*60)
+
+    total_saved = 0
+    total_skipped = 0
+
+    for ym_idx, yearmonth in enumerate(yearmonths, 1):
+        year = yearmonth[:4]
+        month = yearmonth[4:]
+
+        if is_done(progress, source, yearmonth):
+            log.info(f"  [{ym_idx}/{len(yearmonths)}] {yearmonth} — 이미 완료, 스킵")
+            total_skipped += 1
+            continue
+
+        log.info(f"\n  [{ym_idx}/{len(yearmonths)}] {year}년 {month}월호 수집 중...")
+        listing_url = make_ksmi_journal_listing_url(yearmonth)
+        soup = get_page(listing_url)
+        if soup is None:
+            log.warning(f"    → 페이지 요청 실패, 스킵")
+            continue
+
+        if soup.find(string=re.compile(r"등록된\s*데이타가\s*없습니다")):
+            log.info(f"    → 데이터 없음 (빈 권호)")
+            mark_done(progress, source, yearmonth)
+            save_progress(progress)
+            polite_delay()
+            continue
+
+        entries = _parse_ksmi_listing_page(soup)
+        total_pages = _parse_total_pages(soup)
+
+        for p in range(2, total_pages + 1):
+            polite_delay()
+            p_soup = get_page(make_ksmi_journal_listing_url(yearmonth, p))
+            if p_soup:
+                entries.extend(_parse_ksmi_listing_page(p_soup))
+
+        if not entries:
+            log.info(f"    → 논문 없음")
+            mark_done(progress, source, yearmonth)
+            save_progress(progress)
+            polite_delay()
+            continue
+
+        log.info(f"    → {len(entries)}편 발견")
+        saved_in_issue = 0
+
+        for paper_idx, entry in enumerate(entries, 1):
+            dn = entry.dn
+            meta_path = META_DIR / source / f"{dn}.json"
+            if meta_path.exists():
+                saved_in_issue += 1
+                continue
+
+            log.info(f"      [{paper_idx}/{len(entries)}] dn={dn} '{entry.title_ko[:40]}'")
+            d_url = make_ksmi_journal_detail_url(dn, yearmonth)
+            polite_delay()
+            detail = scrape_paper_detail(
+                dn, organCode2, yearmonth,
+                fallback_title=entry.title_ko,
+                detail_url=d_url,
+            )
+
+            paper = Paper(
+                dn=dn,
+                source=source,
+                society=society,
+                organCode2=organCode2,
+                yearmonth=yearmonth,
+                year=year,
+                month=month,
+                title_ko=detail.get("title_ko", entry.title_ko),
+                title_en=detail.get("title_en", ""),
+                authors=[Author(**a) for a in detail.get("authors", [])],
+                abstract_ko=detail.get("abstract_ko", ""),
+                abstract_en=detail.get("abstract_en", ""),
+                keywords=Keywords(
+                    ko=detail.get("keywords", {}).get("ko", []),
+                    en=detail.get("keywords", {}).get("en", []),
+                ),
+                volume=entry.volume or detail.get("volume", ""),
+                issue=entry.issue or detail.get("issue", ""),
+                page=detail.get("page") or entry.page,
+                issn=detail.get("issn", ""),
+                affiliation=detail.get("affiliation", ""),
+                listing_url=listing_url,
+                detail_url=d_url,
+                scraped_at=datetime.now().isoformat(),
+            )
+
+            save_paper(paper)
+            saved_in_issue += 1
+            total_saved += 1
+            log.info(f"        ✓ 저장 완료")
+
+        mark_done(progress, source, yearmonth)
+        save_progress(progress)
+        log.info(f"    → {year}년 {month}월호 완료: {saved_in_issue}편")
+
+    return total_saved, total_skipped
+
+
 def scrape_ksmi_source(
     start_year: int,
     progress: dict,
@@ -887,6 +1029,8 @@ def scrape_source(
     """
     if source == "conference_ksmi":
         return scrape_ksmi_source(start_year, progress)
+    if source == "journal_ksmi":
+        return scrape_ksmi_journal_source(start_year, end_year, progress)
 
     cfg = SOURCES[source]
     organCode2 = cfg["organCode2"]
@@ -1001,14 +1145,16 @@ def print_stats() -> None:
     jm, jp = _count("journal")
     cm, cp = _count("conference")
     km, kp = _count("conference_ksmi")
+    kjm, kjp = _count("journal_ksmi")
 
     print("\n" + "="*60)
     print("  현재 수집 현황")
     print("="*60)
-    print(f"  KCI 학회지        JSON: {jm:5d}편  │  MD: {jp:5d}편")
-    print(f"  KCI 학술대회      JSON: {cm:5d}편  │  MD: {cp:5d}편")
-    print(f"  KSMI 학술발표회   JSON: {km:5d}편  │  MD: {kp:5d}편")
-    print(f"  합계              JSON: {jm+cm+km:5d}편  │  MD: {jp+cp+kp:5d}편")
+    print(f"  KCI 학회지          JSON: {jm:5d}편  │  MD: {jp:5d}편")
+    print(f"  KCI 학술대회        JSON: {cm:5d}편  │  MD: {cp:5d}편")
+    print(f"  KSMI 학술발표회     JSON: {km:5d}편  │  MD: {kp:5d}편")
+    print(f"  KSMI 국문논문집     JSON: {kjm:5d}편  │  MD: {kjp:5d}편")
+    print(f"  합계                JSON: {jm+cm+km+kjm:5d}편  │  MD: {jp+cp+kp+kjp:5d}편")
     print("="*60 + "\n")
 
 
@@ -1016,7 +1162,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="KCI 콘크리트학회 논문 메타데이터 수집기")
     parser.add_argument(
         "--source",
-        choices=["journal", "conference", "conference_ksmi", "both"],
+        choices=["journal", "conference", "conference_ksmi", "journal_ksmi", "both"],
         default="both",
         help="수집 대상 (기본: both = journal + conference)",
     )
