@@ -106,7 +106,7 @@ def build_html(*, year_min, year_max, total_papers, total_authors, total_links,
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
 body{font-family:'Pretendard','Apple SD Gothic Neo',-apple-system,sans-serif;
-     background:var(--bg);color:var(--tx);font-size:15px;line-height:1.5}
+     background:var(--bg);color:var(--tx);font-size:16px;line-height:1.55}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
@@ -115,16 +115,16 @@ header{height:52px;background:var(--s1);border-bottom:1px solid var(--bd);
        display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0}
 .logo{width:32px;height:32px;background:linear-gradient(135deg,#5b8dee,#a78bfa);
       border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.htitle{font-size:15px;font-weight:700;letter-spacing:-.3px}
-.hsub{font-size:12px;color:var(--t2)}
+.htitle{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.hsub{font-size:13px;color:var(--t2)}
 .hchips{margin-left:auto;display:flex;gap:8px}
 .chip{background:var(--s3);border:1px solid var(--bd2);border-radius:20px;
-      padding:4px 10px;font-size:12px;color:var(--t2)}
+      padding:4px 10px;font-size:13px;color:var(--t2)}
 .chip b{color:var(--ac);font-weight:700}
 .tabbar{height:42px;background:var(--s1);border-bottom:1px solid var(--bd);
         display:flex;align-items:stretch;padding:0 20px;gap:2px;flex-shrink:0}
 .tab{display:flex;align-items:center;gap:6px;padding:0 16px;
-     font-size:14px;font-weight:500;color:var(--t2);cursor:pointer;
+     font-size:15px;font-weight:500;color:var(--t2);cursor:pointer;
      border-bottom:2px solid transparent;transition:color var(--tr),border-color var(--tr);
      user-select:none;white-space:nowrap}
 .tab:hover{color:var(--tx)}
@@ -137,15 +137,15 @@ header{height:52px;background:var(--s1);border-bottom:1px solid var(--bd);
 .sidebar{width:256px;flex-shrink:0;background:var(--s1);
          border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
 .sb-top{padding:14px;border-bottom:1px solid var(--bd);display:flex;flex-direction:column;gap:8px}
-.sb-top h3{font-size:12px;font-weight:600;color:var(--t2);letter-spacing:.3px}
+.sb-top h3{font-size:13px;font-weight:600;color:var(--t2);letter-spacing:.3px}
 .inp{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:var(--rs);
-     padding:7px 10px;font-size:12.5px;color:var(--tx);outline:none;transition:border-color var(--tr)}
+     padding:7px 10px;font-size:13.5px;color:var(--tx);outline:none;transition:border-color var(--tr)}
 .inp:focus{border-color:var(--ac)}
 .inp::placeholder{color:var(--t3)}
-.frow{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t2)}
+.frow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2)}
 .frow input[type=range]{flex:1;accent-color:var(--ac);cursor:pointer}
 .fval{min-width:24px;text-align:right;color:var(--ac);font-weight:700}
-.scnt{font-size:11px;color:var(--t3);text-align:right}
+.scnt{font-size:12px;color:var(--t3);text-align:right}
 .alist{flex:1;overflow-y:auto;padding:5px 0}
 .aitem{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;
        border-left:2px solid transparent;transition:background var(--tr),border-color var(--tr)}
@@ -154,9 +154,9 @@ header{height:52px;background:var(--s1);border-bottom:1px solid var(--bd);
 .av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
     justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
 .ain{flex:1;min-width:0}
-.an{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.as{font-size:12px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ab{font-size:10px;font-weight:700;background:var(--s3);border:1px solid var(--bd2);
+.an{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.as{font-size:13px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab{font-size:11px;font-weight:700;background:var(--s3);border:1px solid var(--bd2);
     border-radius:10px;padding:1px 7px;flex-shrink:0;color:var(--t2)}
 .netcanvas{flex:1;position:relative;overflow:hidden;background:var(--bg)}
 #netcvs{width:100%;height:100%;display:block;cursor:default}
@@ -171,14 +171,14 @@ header{height:52px;background:var(--s1);border-bottom:1px solid var(--bd);
         backdrop-filter:blur(6px);border:1px solid var(--bd);border-radius:var(--rs);
         padding:10px 12px;pointer-events:none}
 .legend h5{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
-.lr{display:flex;align-items:center;gap:7px;margin-bottom:4px;font-size:11px;color:var(--t2)}
+.lr{display:flex;align-items:center;gap:7px;margin-bottom:4px;font-size:12px;color:var(--t2)}
 .ld{border-radius:50%;flex-shrink:0}
 .nst{position:absolute;right:14px;top:14px;background:rgba(9,12,20,.88);
      backdrop-filter:blur(6px);border:1px solid var(--bd);border-radius:var(--rs);
-     padding:6px 12px;font-size:11px;color:var(--t2);pointer-events:none}
+     padding:6px 12px;font-size:12px;color:var(--t2);pointer-events:none}
 .tip{position:fixed;pointer-events:none;opacity:0;
      background:var(--s2);border:1px solid var(--bd2);border-radius:var(--rs);
-     padding:9px 12px;font-size:12px;box-shadow:var(--sh);
+     padding:9px 12px;font-size:13px;box-shadow:var(--sh);
      transition:opacity .1s;max-width:220px;z-index:9999;line-height:1.6}
 /* Drawer */
 .drawer{position:absolute;top:0;right:0;bottom:0;width:320px;
@@ -191,8 +191,8 @@ header{height:52px;background:var(--s1);border-bottom:1px solid var(--bd);
     display:flex;align-items:flex-start;gap:10px}
 .dav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;
      justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
-.dname{font-size:16px;font-weight:700;line-height:1.3}
-.den{font-size:12px;color:var(--t2);margin-top:2px}
+.dname{font-size:17px;font-weight:700;line-height:1.3}
+.den{font-size:13px;color:var(--t2);margin-top:2px}
 .dcls{margin-left:auto;width:28px;height:28px;background:var(--s3);
       border:1px solid var(--bd2);border-radius:6px;cursor:pointer;
       display:flex;align-items:center;justify-content:center;
@@ -201,16 +201,16 @@ header{height:52px;background:var(--s1);border-bottom:1px solid var(--bd);
 .dstats{display:grid;grid-template-columns:1fr 1fr 1fr;padding:12px 16px;
         border-bottom:1px solid var(--bd);gap:8px}
 .ds{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:8px;text-align:center}
-.dsv{font-size:16px;font-weight:700;color:var(--ac)}
-.dsl{font-size:10px;color:var(--t2);margin-top:2px}
+.dsv{font-size:17px;font-weight:700;color:var(--ac)}
+.dsl{font-size:11px;color:var(--t2);margin-top:2px}
 .dbody{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:14px}
-.dsec h4{font-size:10.5px;font-weight:600;color:var(--t2);
+.dsec h4{font-size:12px;font-weight:600;color:var(--t2);
          text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .ci{display:flex;align-items:center;justify-content:space-between;
     padding:6px 10px;border-radius:var(--rs);cursor:pointer;transition:background var(--tr)}
 .ci:hover{background:var(--s3)}
-.cn{font-size:12.5px;font-weight:500;color:var(--ac)}
-.cc{font-size:11px;color:var(--t2);background:var(--s3);border:1px solid var(--bd);
+.cn{font-size:13.5px;font-weight:500;color:var(--ac)}
+.cc{font-size:12px;color:var(--t2);background:var(--s3);border:1px solid var(--bd);
     border-radius:10px;padding:1px 7px}
 a.pi,div.pi{display:flex;flex-direction:column;gap:4px;padding:9px 10px;
     border-radius:var(--rs);border:1px solid var(--bd);background:var(--s2);
@@ -220,8 +220,8 @@ a.pi:hover,div.pi:hover{border-color:var(--ac);background:rgba(91,141,238,.06)}
 .pit{display:flex;align-items:flex-start;gap:8px}
 .piy{font-size:10px;font-weight:700;color:var(--ac);background:rgba(91,141,238,.12);
      border-radius:4px;padding:1px 5px;flex-shrink:0;margin-top:1px}
-.piti{font-size:12px;font-weight:500;line-height:1.45;color:var(--tx)}
-.pim{font-size:10.5px;color:var(--t2)}
+.piti{font-size:13px;font-weight:500;line-height:1.45;color:var(--tx)}
+.pim{font-size:12px;color:var(--t2)}
 .pilh{font-size:10px;color:var(--ac);margin-top:2px}
 .pij{color:var(--ac)}.pic{color:var(--gr)}.pik{color:#fb923c}
 /* Trends */
@@ -231,9 +231,9 @@ a.pi:hover,div.pi:hover{border-color:var(--ac);background:rgba(91,141,238,.06)}
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:18px}
 .card-hd{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.card-hd h3{font-size:13px;font-weight:600;color:var(--t2);
+.card-hd h3{font-size:14px;font-weight:600;color:var(--t2);
             letter-spacing:.2px;flex:1}
-.card h3{font-size:13px;font-weight:600;color:var(--t2);
+.card h3{font-size:14px;font-weight:600;color:var(--t2);
          letter-spacing:.2px;margin-bottom:14px}
 .cw{position:relative;height:200px}
 .full{grid-column:1/-1}.full .cw{height:240px}
@@ -244,7 +244,7 @@ a.pi:hover,div.pi:hover{border-color:var(--ac);background:rgba(91,141,238,.06)}
 .tfilterbar label{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px}
 /* 통합 세그먼트 컨트롤 */
 .seg,.tseg,.sort-seg,.smode-seg{display:flex;border:1px solid var(--bd2);border-radius:var(--rs);overflow:hidden}
-.seg-btn,.tseg-btn,.sort-btn,.smode-btn{padding:5px 12px;font-size:11.5px;color:var(--t2);cursor:pointer;
+.seg-btn,.tseg-btn,.sort-btn,.smode-btn{padding:5px 12px;font-size:12.5px;color:var(--t2);cursor:pointer;
   background:transparent;border:none;transition:all .13s;white-space:nowrap}
 .seg-btn.on,.tseg-btn.on,.sort-btn.on,.smode-btn.on{background:var(--ac);color:#fff;font-weight:600}
 /* focus-visible 접근성 */
@@ -268,24 +268,24 @@ a.pi:hover,div.pi:hover{border-color:var(--ac);background:rgba(91,141,238,.06)}
 /* Topic toggles */
 .topic-toggles{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
 .ttog{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;
-      font-size:11px;cursor:pointer;border:1.5px solid;transition:all .15s;user-select:none}
+      font-size:12px;cursor:pointer;border:1.5px solid;transition:all .15s;user-select:none}
 .ttog.off{opacity:.35}
 .ttog .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .ttog .cagr{font-size:11px;opacity:.75;margin-left:2px}
 .topic-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
 .tc-sort{background:var(--s3);border:1px solid var(--bd2);border-radius:var(--rs);
          padding:4px 8px;font-size:11.5px;color:var(--tx);outline:none;cursor:pointer}
-.tc-hint{font-size:10px;color:var(--t3)}
+.tc-hint{font-size:11px;color:var(--t3)}
 /* 성장률 랭킹 */
 .rank-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .rank-item{display:flex;align-items:center;gap:10px;padding:7px 10px;
            background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer}
 .rank-item:hover{border-color:var(--ac)}
-.rank-no{font-size:11px;color:var(--t3);width:16px;text-align:center}
-.rank-name{flex:1;font-size:12px;font-weight:500}
+.rank-no{font-size:12px;color:var(--t3);width:16px;text-align:center}
+.rank-name{flex:1;font-size:13px;font-weight:500}
 .rank-bar-wrap{width:60px;height:5px;background:var(--s3);border-radius:3px;flex-shrink:0}
 .rank-bar{height:5px;border-radius:3px}
-.rank-val{font-size:11px;font-weight:700;width:42px;text-align:right;flex-shrink:0}
+.rank-val{font-size:12px;font-weight:700;width:42px;text-align:right;flex-shrink:0}
 /* Heatmap */
 #hmap-wrap{overflow-x:auto;padding-bottom:4px}
 .hmap-cell{border-radius:2px;cursor:pointer;flex-shrink:0;transition:transform .1s}
@@ -510,6 +510,10 @@ td.num{color:var(--t2);text-align:right}
         '      <div class="ds"><div class="dsv" id="dcol">—</div><div class="dsl">공저자</div></div>'
         '      <div class="ds"><div class="dsv" id="dyrs">—</div><div class="dsl">활동기간</div></div>'
         '    </div>'
+        '    <div id="local-graph" style="border-bottom:1px solid var(--bd);padding:8px 12px;background:var(--bg)">'
+        '      <div style="font-size:11px;color:var(--t3);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px">로컬 네트워크</div>'
+        '      <svg id="local-svg" width="292" height="160"></svg>'
+        '    </div>'
         '    <div class="dbody" id="dbody"></div>'
         '  </div>'
         '</div>'
@@ -536,16 +540,28 @@ td.num{color:var(--t2);text-align:right}
         '  </div>'
         # 본문 컨텐츠
         '  <div class="trend-content">'
-        # 1. 연도별 발행량 (메인, full)
-        '    <div class="card full">'
-        '      <div class="card-hd"><h3>📊 연도별 논문 발행 현황</h3></div>'
-        '      <div class="kpi-strip" id="yr-kpis"></div>'
-        '      <div class="cw" style="height:220px"><canvas id="cyr"></canvas></div>'
+        # 1. 연도별 발행량 + 급성장/감소 랭킹 나란히 (2:1)
+        '    <div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:stretch">'
+        '      <div class="card" style="display:flex;flex-direction:column">'
+        '        <div class="card-hd"><h3>📊 연도별 논문 발행 현황</h3></div>'
+        '        <div class="kpi-strip" id="yr-kpis"></div>'
+        '        <div class="cw" style="flex:1;min-height:180px"><canvas id="cyr"></canvas></div>'
+        '      </div>'
+        '      <div style="display:flex;flex-direction:column;gap:16px;min-width:320px">'
+        '        <div class="card" style="flex:1">'
+        '          <h3>🚀 최근 5년 급성장 주제</h3>'
+        '          <div class="rank-grid" id="rank-rise"></div>'
+        '        </div>'
+        '        <div class="card" style="flex:1">'
+        '          <h3>📉 최근 5년 감소 주제</h3>'
+        '          <div class="rank-grid" id="rank-fall"></div>'
+        '        </div>'
+        '      </div>'
         '    </div>'
-        # 2+4. 히트맵(좌) + 주제 트렌드(우) 나란히
-        '    <div style="display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start">'
+        # 2. 히트맵(좌) + 주제 트렌드(우) 나란히, 높이 통일
+        '    <div style="display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:stretch">'
         # 히트맵 (좌)
-        '      <div class="card">'
+        '      <div class="card" style="display:flex;flex-direction:column">'
         '        <div class="card-hd">'
         '          <h3>🗓 주제 × 연도 히트맵</h3>'
         '          <div class="tseg" id="hmgran">'
@@ -553,10 +569,10 @@ td.num{color:var(--t2);text-align:right}
         '            <div class="tseg-btn on" data-v="5year">5년 단위</div>'
         '          </div>'
         '        </div>'
-        '        <div id="hmap-wrap"><div id="hmap"></div></div>'
+        '        <div id="hmap-wrap" style="flex:1;overflow-x:auto;padding-bottom:4px"><div id="hmap"></div></div>'
         '      </div>'
-        # 주제 트렌드 (우)
-        '      <div class="card">'
+        # 주제 트렌드 (우) — flex-column으로 캔버스가 남은 공간 채움
+        '      <div class="card" style="display:flex;flex-direction:column;min-width:0">'
         '        <div class="card-hd">'
         '          <h3>📈 연구 주제 트렌드</h3>'
         '          <div class="topic-ctrl">'
@@ -569,22 +585,11 @@ td.num{color:var(--t2);text-align:right}
         '          </div>'
         '        </div>'
         '        <div class="topic-toggles" id="topic-toggles"></div>'
-        '        <div class="cw" style="height:280px"><canvas id="ctopic"></canvas></div>'
-        '        <p style="font-size:10px;color:var(--t3);margin-top:6px">※ 제목 키워드 기반 자동 분류 · 참고용</p>'
+        '        <div style="flex:1;min-height:200px;position:relative"><canvas id="ctopic" style="width:100%;height:100%"></canvas></div>'
+        '        <p style="font-size:11px;color:var(--t3);margin-top:6px">※ 제목 키워드 기반 자동 분류 · 참고용</p>'
         '      </div>'
         '    </div>'
-        # 3. 주제 성장률 랭킹
-        '    <div class="tgrid">'
-        '      <div class="card">'
-        '        <h3>🚀 최근 5년 급성장 주제</h3>'
-        '        <div class="rank-grid" id="rank-rise"></div>'
-        '      </div>'
-        '      <div class="card">'
-        '        <h3>📉 최근 5년 감소 주제</h3>'
-        '        <div class="rank-grid" id="rank-fall"></div>'
-        '      </div>'
-        '    </div>'
-        # 5. 활동 저자 + 논문당 저자 수
+        # 3. 활동 저자 + 논문당 저자 수
         '    <div class="tgrid">'
         '      <div class="card"><h3>👥 연도별 활동 저자 수</h3><div class="cw"><canvas id="cua"></canvas></div></div>'
         '      <div class="card"><h3>✍️ 논문당 평균 저자 수</h3><div class="cw"><canvas id="cco"></canvas></div></div>'
@@ -697,6 +702,16 @@ const YEAR_MAX=__YMAX__;
 const PMAP={};PAPERS.forEach(p=>PMAP[p.dn]=p);
 const NM={};GRAPH.nodes.forEach(n=>NM[n.id]=n);
 const SOCIETIES=[...new Set(PAPERS.map(p=>p.soc||'KCI'))];
+// 인접 리스트 (로컬 그래프용)
+const ADJ=new Map();
+GRAPH.links.forEach(l=>{
+  const s=typeof l.source==='object'?l.source.id:l.source;
+  const t=typeof l.target==='object'?l.target.id:l.target;
+  if(!ADJ.has(s))ADJ.set(s,[]);
+  if(!ADJ.has(t))ADJ.set(t,[]);
+  ADJ.get(s).push({id:t,w:l.weight||1});
+  ADJ.get(t).push({id:s,w:l.weight||1});
+});
 
 const nc=c=>c>=50?'#f87171':c>=20?'#fb923c':c>=5?'#34d399':'#5b8dee';
 const nr=c=>c>=50?13:c>=20?9:c>=5?6.5:4.5;
@@ -949,6 +964,46 @@ function openDrawer(n){
     });
   }
   document.getElementById('drawer').classList.add('open');
+  renderLocalGraph(n.id);
+}
+function renderLocalGraph(centerId){
+  const svgEl=document.getElementById('local-svg');
+  if(!svgEl)return;
+  // 기존 내용 제거
+  while(svgEl.firstChild)svgEl.removeChild(svgEl.firstChild);
+  const W=292,H=160;
+  const neighbors=(ADJ.get(centerId)||[]).slice().sort((a,b)=>b.w-a.w).slice(0,14);
+  if(!neighbors.length)return;
+  const NS=d3.select(svgEl);
+  const nodeData=[{id:centerId,r:12,center:true},...neighbors.map(n=>({id:n.id,r:Math.min(4+n.w*.5,9),center:false,w:n.w}))];
+  const linkData=neighbors.map(n=>({source:centerId,target:n.id,w:n.w}));
+  const sim=d3.forceSimulation(nodeData)
+    .force('link',d3.forceLink(linkData).id(d=>d.id).distance(52))
+    .force('charge',d3.forceManyBody().strength(-90))
+    .force('center',d3.forceCenter(W/2,H/2))
+    .force('collide',d3.forceCollide(d=>d.r+4));
+  const link=NS.append('g').selectAll('line').data(linkData).join('line')
+    .attr('stroke','#252d48').attr('stroke-width',d=>Math.min(d.w*.4+.8,3));
+  const node=NS.append('g').selectAll('circle').data(nodeData).join('circle')
+    .attr('r',d=>d.r)
+    .attr('fill',d=>d.center?'#5b8dee':nc(NM[d.id]?.paper_count||1))
+    .attr('stroke','#090c14').attr('stroke-width',1.5)
+    .style('cursor',d=>d.center?'default':'pointer');
+  node.filter(d=>!d.center).on('click',(e,d)=>selectById(d.id));
+  node.append('title').text(d=>d.center?d.id:`${d.id} (공저 ${d.w||0}편)`);
+  const lbl=NS.append('g').selectAll('text').data(nodeData).join('text')
+    .text(d=>{const n=d.id;return n.length>3?n.slice(0,3)+'…':n;})
+    .attr('text-anchor','middle').attr('fill',d=>d.center?'#e2e8f8':'#7c89ae')
+    .attr('font-size',d=>d.center?10:9).attr('pointer-events','none')
+    .attr('dy',d=>d.r+11);
+  sim.on('tick',()=>{
+    const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+    link.attr('x1',d=>clamp(d.source.x,0,W)).attr('y1',d=>clamp(d.source.y,0,H))
+        .attr('x2',d=>clamp(d.target.x,0,W)).attr('y2',d=>clamp(d.target.y,0,H));
+    node.attr('cx',d=>clamp(d.x,d.r,W-d.r)).attr('cy',d=>clamp(d.y,d.r,H-d.r));
+    lbl.attr('x',d=>clamp(d.x,d.r,W-d.r)).attr('y',d=>clamp(d.y,d.r,H-d.r));
+  });
+  setTimeout(()=>sim.stop(),2500);
 }
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');selId=null;draw();}
 function selectById(name){
