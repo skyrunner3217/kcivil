@@ -80,7 +80,12 @@ with open(f"{net}/author_papers.json","w",encoding="utf-8") as f:
 print(f"  저장 완료 (papers_lite, yearly_stats, author_papers)")
 EOF
 
-# 2) 네트워크 재구축
+# 2) 주제 트렌드 재집계
+echo ""
+echo "[2.5/4] 주제 트렌드 재집계 (topic_trends.json)..."
+$PYTHON analyze/build_topics.py
+
+# 3) 네트워크 재구축
 echo ""
 echo "[3/4] 저자 공저 네트워크 재구축..."
 $PYTHON analyze/build_network.py --min-papers 1

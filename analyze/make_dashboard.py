@@ -223,7 +223,7 @@ a.pi:hover,div.pi:hover{border-color:var(--ac);background:rgba(91,141,238,.06)}
 .piti{font-size:12px;font-weight:500;line-height:1.45;color:var(--tx)}
 .pim{font-size:10.5px;color:var(--t2)}
 .pilh{font-size:10px;color:var(--ac);margin-top:2px}
-.pij{color:var(--ac)}.pic{color:var(--gr)}
+.pij{color:var(--ac)}.pic{color:var(--gr)}.pik{color:#fb923c}
 /* Trends */
 #ptrend{flex-direction:column;overflow-y:auto;padding:0;gap:0}
 #ptrend::-webkit-scrollbar{width:5px}
@@ -271,7 +271,7 @@ a.pi:hover,div.pi:hover{border-color:var(--ac);background:rgba(91,141,238,.06)}
       font-size:11px;cursor:pointer;border:1.5px solid;transition:all .15s;user-select:none}
 .ttog.off{opacity:.35}
 .ttog .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.ttog .cagr{font-size:9.5px;opacity:.75;margin-left:2px}
+.ttog .cagr{font-size:11px;opacity:.75;margin-left:2px}
 .topic-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
 .tc-sort{background:var(--s3);border:1px solid var(--bd2);border-radius:var(--rs);
          padding:4px 8px;font-size:11.5px;color:var(--tx);outline:none;cursor:pointer}
@@ -405,6 +405,9 @@ a.pc:hover,div.pc:hover{border-color:var(--ac);background:rgba(91,141,238,.04)}
 .badge{border-radius:4px;padding:2px 7px;font-size:11px;font-weight:500;border:1px solid}
 .bj{color:var(--ac);border-color:rgba(91,141,238,.3);background:rgba(91,141,238,.08)}
 .bc{color:var(--gr);border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)}
+.bk{color:#fb923c;border-color:rgba(251,146,60,.3);background:rgba(251,146,60,.08)}
+.bksmi{color:#fb923c!important;font-weight:600}
+.bksmi.on{background:#fb923c!important}
 .pca{font-size:13px;color:var(--t2)}
 .pctag{font-size:10.5px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.25);
        color:#a78bfa;border-radius:4px;padding:1px 6px}
@@ -600,6 +603,11 @@ td.num{color:var(--t2);text-align:right}
         '        <div class="tseg-btn" data-v="journal">학회지</div>'
         '        <div class="tseg-btn" data-v="conference">학술대회</div>'
         '      </div>'
+        '      <div class="tseg" id="ssoc" style="margin-left:4px">'
+        '        <div class="tseg-btn on" data-v="all" title="KCI + KSMI 전체">전체</div>'
+        '        <div class="tseg-btn" data-v="KCI" title="한국콘크리트학회">KCI</div>'
+        '        <div class="tseg-btn bksmi" data-v="KSMI" title="한국구조물진단유지관리공학회">KSMI</div>'
+        '      </div>'
         f'     <div class="yr"><input class="yri" id="yrf" value="{year_min}"><span>–</span><input class="yri" id="yrt" value="{year_max}"></div>'
         '    </div>'
         # 필터 바: 한 줄 (주제 대분류 + AI 세부분야 토글 + OR/AND)
@@ -657,6 +665,7 @@ td.num{color:var(--t2);text-align:right}
         f'    <div class="kc"><div class="kv">{total_links}</div><div class="kl">공저 관계</div></div>'
         f'    <div class="kc"><div class="kv">{span}</div><div class="kl">수집 기간(년)</div></div>'
         '  </div>'
+        '  <div id="stat-insights" style="margin:10px 0 14px"></div>'
         '  <div class="sgrid">'
         '    <div class="card"><h3>논문 수 상위 20인</h3>'
         '      <table class="rt"><thead><tr><th>#</th><th>이름</th><th>영문</th>'
@@ -904,28 +913,45 @@ function openDrawer(n){
         <span class="cn">${esc(c.name)}</span><span class="cc">${c.cnt}편</span></div>`).join('')}
     </div>`;
   }
-  html+=`<div class="dsec"><h4>논문 ${allP.length}편</h4>
-    ${allP.map(p=>{
-      const tag=p.url?`a href="${p.url}" target="_blank" rel="noopener"`:'div';
-      return `<${tag} class="pi">
-        <div class="pit">
-          <span class="piy">${p.y}</span>
-          <div>
-            <div class="piti">${esc(p.t||'(제목 없음)')}</div>
-            <div class="pim"><span class="${p.src==='journal'?'pij':'pic'}">${p.src==='journal'?'학회지':'학술대회'}</span>${p.vol?' · Vol.'+p.vol:''}</div>
-          </div>
+  const _DPG=50;
+  const _renderPItems=(arr)=>arr.map(p=>{
+    const tag=p.url?`a href="${p.url}" target="_blank" rel="noopener"`:'div';
+    const socBadge=p.soc==='KSMI'?' · KSMI':'';
+    return `<${tag} class="pi">
+      <div class="pit">
+        <span class="piy">${p.y}</span>
+        <div>
+          <div class="piti">${esc(p.t||'(제목 없음)')}</div>
+          <div class="pim"><span class="${p.src==='journal'?'pij':(p.soc==='KSMI'?'pik':'pic')}">${p.src==='journal'?'학회지':'학술대회'}${socBadge}</span>${p.vol?' · Vol.'+p.vol:''}</div>
         </div>
-        ${p.url?'<div class="pilh">↗ 논문 상세 보기</div>':''}
-      </${p.url?'a':'div'}>`;
-    }).join('')}
+      </div>
+      ${p.url?'<div class="pilh">↗ 논문 상세 보기</div>':''}
+    </${p.url?'a':'div'}>`;
+  }).join('');
+  const _rem=allP.length-_DPG;
+  html+=`<div class="dsec"><h4>논문 ${allP.length}편</h4>
+    <div id="dplist">${_renderPItems(allP.slice(0,_DPG))}</div>
+    ${_rem>0?`<button class="stag-clear" id="dmore" style="width:100%;margin-top:6px;padding:6px">나머지 ${_rem}편 더 보기</button>`:''}
   </div>`;
   document.getElementById('dbody').innerHTML=html;
+  if(_rem>0){
+    let _shown=_DPG;
+    document.getElementById('dmore').addEventListener('click',()=>{
+      const next=Math.min(_shown+_DPG,allP.length);
+      document.getElementById('dplist').insertAdjacentHTML('beforeend',_renderPItems(allP.slice(_shown,next)));
+      _shown=next;
+      const btn=document.getElementById('dmore');
+      if(_shown>=allP.length&&btn)btn.remove();
+      else if(btn)btn.textContent=`나머지 ${allP.length-_shown}편 더 보기`;
+    });
+  }
   document.getElementById('drawer').classList.add('open');
 }
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');selId=null;draw();}
 function selectById(name){
   const n=NM[name]||{id:name,en:'',paper_count:(AP[name]||[]).length,degree:0,first_year:'',last_year:''};
   openDrawer(n);
+  if(NM[name]&&NM[name].x!=null)zoomToNode(name);
 }
 document.getElementById('dcls').onclick=e=>{e.stopPropagation();closeDrawer();};
 // Escape 키로 드로어 닫기
@@ -1003,7 +1029,7 @@ function getPaperTopics(p){
 }
 
 // 검색 상태
-const SF={src:'all',sort:'recent',tags:new Set(),tagLogic:'or'};
+const SF={src:'all',soc:'all',sort:'recent',tags:new Set(),tagLogic:'or'};
 let trendChart=null,searchHistory=[];
 
 const sinp=document.getElementById('sinp');
@@ -1017,6 +1043,12 @@ const relRow=document.getElementById('rel-row');
 const histDrop=document.getElementById('hist-drop');
 
 // 출처 세그먼트
+document.querySelectorAll('#ssoc .tseg-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#ssoc .tseg-btn').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); SF.soc=b.dataset.v; doSearch();
+  });
+});
 document.querySelectorAll('#ssrc .tseg-btn').forEach(b=>{
   b.addEventListener('click',()=>{
     document.querySelectorAll('#ssrc .tseg-btn').forEach(x=>x.classList.remove('on'));
@@ -1275,6 +1307,7 @@ function doSearch(){
   let res=PAPERS.filter(p=>{
     const yr=+p.y; if(yr<yf||yr>yt)return false;
     if(SF.src!=='all'&&p.src!==SF.src)return false;
+    if(SF.soc!=='all'&&(p.soc||'KCI')!==SF.soc)return false;
     if(SF.tags.size>0){
       const pt=getPaperTopics(p);
       if(SF.tagLogic==='and'){if(![...SF.tags].every(t=>pt.includes(t)))return false;}
@@ -1370,7 +1403,7 @@ function doSearch(){
     return `<${tag} class="pc">
       <div class="pct">${hl(p.t||'(제목 없음)',q)}</div>
       <div class="pcm">
-        <span class="badge ${p.src==='journal'?'bj':'bc'}">${p.src==='journal'?'학회지':'학술대회'}</span>
+        <span class="badge ${p.src==='journal'?'bj':(p.soc==='KSMI'?'bk':'bc')}">${p.src==='journal'?'학회지':'학술대회'}${p.soc==='KSMI'?' · KSMI':''}</span>
         <span>${p.y}년${p.m?' '+p.m+'월':''}</span>
         ${p.vol?`<span>Vol.${p.vol}${p.iss?' No.'+p.iss:''}</span>`:''}
         ${auth?`<span class="pca">${hl(auth,q)}</span>`:''}
@@ -1477,7 +1510,18 @@ function exportCSV(){
 
 function goToAuthor(name){
   document.querySelector('[data-tab="net"]').click();
-  setTimeout(()=>selectById(name),250);
+  setTimeout(()=>{
+    selectById(name);
+    zoomToNode(name);
+  },350);
+}
+function zoomToNode(name){
+  const n=NM[name]; if(!n||n.x==null)return;
+  const W=cvs.clientWidth||cvs.width, H=cvs.clientHeight||cvs.height;
+  const k=Math.min(W,H)/120;
+  const tx=W/2-n.x*k, ty=H/2-n.y*k;
+  d3.select(cvs).transition().duration(650).ease(d3.easeCubicInOut)
+    .call(zb.transform, d3.zoomIdentity.translate(tx,ty).scale(k));
 }
 
 // ── Trends ──────────────────────────────────────────────────────
@@ -1797,7 +1841,7 @@ function buildHeatmap(){
   html+=`<div style="display:flex;margin-left:${labelW}px;gap:1px">`;
   for(const p of periods){
     const lbl=gran==='5year'?p+'s':p;
-    html+=`<div style="width:${cellW}px;font-size:9px;color:#3a4560;text-align:center;writing-mode:vertical-rl;transform:rotate(180deg);padding:3px 0;height:${gran==='year'?28:22}px">${lbl}</div>`;
+    html+=`<div style="width:${cellW}px;font-size:10px;color:#3a4560;text-align:center;writing-mode:vertical-rl;transform:rotate(180deg);padding:3px 0;height:${gran==='year'?28:22}px">${lbl}</div>`;
   }
   html+='</div>';
 
@@ -1885,6 +1929,30 @@ function showHmapTip(e,topic,period,pct,cnt){
 // Stats
 function buildStats(){
   sBuilt=true;
+  // ── 파생 인사이트 ──────────────────────────────────────────────────
+  (function(){
+    const el=document.getElementById('stat-insights');
+    if(!el)return;
+    const yrs=TOPICS.years, last5=yrs.slice(-5), prev5=yrs.slice(-10,-5);
+    const growth=TOPICS.topics.map(t=>{
+      const s=prev5.reduce((a,y)=>a+(TOPICS.data[t][y]||0),0)||1;
+      const e=last5.reduce((a,y)=>a+(TOPICS.data[t][y]||0),0);
+      return{t,pct:Math.round((e/s-1)*100)};
+    }).filter(x=>!isNaN(x.pct)).sort((a,b)=>b.pct-a.pct);
+    const top3=growth.slice(0,3).map(x=>`<span style="color:var(--gr)">↑${x.pct}%</span> ${x.t}`).join(' &nbsp;·&nbsp; ');
+    const allYrs=Object.entries(YEARLY).map(([y,d])=>({y,n:d.j+(d.c||0)})).sort((a,b)=>b.n-a.n);
+    const peak=allYrs[0];
+    const avgCo=Object.entries(YEARLY).sort((a,b)=>+a[0]-+b[0]).slice(-5).map(([y,d])=>{
+      const ps=PAPERS.filter(p=>p.y==y);
+      const s=ps.reduce((a,p)=>(a+(p.a||[]).length),0);
+      return(s/Math.max(ps.length,1)).toFixed(1);
+    });
+    el.innerHTML=`<div class="card" style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div><div style="font-size:11px;color:var(--t3);margin-bottom:4px">📈 최근 5년 급성장 주제</div><div style="font-size:13px">${top3}</div></div>
+      <div><div style="font-size:11px;color:var(--t3);margin-bottom:4px">🏆 역대 최다 발행 연도</div><div style="font-size:13px"><b>${peak.y}년</b> <span style="color:var(--t2)">(${peak.n}편)</span></div></div>
+      <div><div style="font-size:11px;color:var(--t3);margin-bottom:4px">👥 최근 5년 평균 공저자</div><div style="font-size:13px">${avgCo.join(' → ')} 명</div></div>
+    </div>`;
+  })();
   const topBw=GRAPH.nodes.slice().sort((a,b)=>(b.betweenness||0)-(a.betweenness||0)).slice(0,15);
   const maxBw=topBw[0].betweenness||1;
   document.getElementById('bwlist').innerHTML=`
