@@ -521,7 +521,7 @@ td.num{color:var(--t2);text-align:right}
         '    </div>'
         '    <div id="local-graph" style="border-bottom:1px solid var(--bd);padding:8px 12px;background:var(--bg)">'
         '      <div style="font-size:11px;color:var(--t3);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px">로컬 네트워크</div>'
-        '      <svg id="local-svg" width="292" height="160"></svg>'
+        '      <svg id="local-svg" style="width:100%;display:block" height="220"></svg>'
         '    </div>'
         '    <div class="dbody" id="dbody"></div>'
         '  </div>'
@@ -549,13 +549,8 @@ td.num{color:var(--t2);text-align:right}
         '  </div>'
         # 본문 컨텐츠
         '  <div class="trend-content">'
-        # 1. 연도별 차트 + 급성장 + 감소 — 3열 한 행
-        '    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;align-items:stretch">'
-        '      <div class="card" style="display:flex;flex-direction:column">'
-        '        <div class="card-hd"><h3>📊 연도별 논문 발행 현황</h3></div>'
-        '        <div class="kpi-strip" id="yr-kpis"></div>'
-        '        <div class="cw" style="flex:1;min-height:180px"><canvas id="cyr"></canvas></div>'
-        '      </div>'
+        # 1. 급성장 + 감소 + 연도별 차트 — 3열 한 행
+        '    <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:16px;align-items:stretch">'
         '      <div class="card">'
         '        <div class="card-hd" style="margin-bottom:10px"><h3>🚀 급성장 주제</h3></div>'
         '        <div id="rank-rise" style="display:flex;flex-direction:column;gap:6px"></div>'
@@ -563,6 +558,11 @@ td.num{color:var(--t2);text-align:right}
         '      <div class="card">'
         '        <div class="card-hd" style="margin-bottom:10px"><h3>📉 감소 주제</h3></div>'
         '        <div id="rank-fall" style="display:flex;flex-direction:column;gap:6px"></div>'
+        '      </div>'
+        '      <div class="card" style="display:flex;flex-direction:column">'
+        '        <div class="card-hd"><h3>📊 연도별 논문 발행 현황</h3></div>'
+        '        <div class="kpi-strip" id="yr-kpis"></div>'
+        '        <div class="cw" style="flex:1;min-height:180px"><canvas id="cyr"></canvas></div>'
         '      </div>'
         '    </div>'
         # 2. 히트맵(좌) + 주제 트렌드(우) 나란히, 높이 통일
@@ -1000,15 +1000,13 @@ function renderLocalGraph(centerId){
       '</div>';
     lgEl.insertBefore(tog,svgEl);
   }
-  const W=292,H=160;
-  const neighbors=(ADJ.get(centerId)||[]).slice().sort((a,b)=>b.w-a.w).slice(0,12);
+  const W=svgEl.clientWidth||260, H=220;
+  svgEl.setAttribute('height',H);
+  const neighbors=(ADJ.get(centerId)||[]).slice().sort((a,b)=>b.w-a.w).slice(0,20);
   if(!neighbors.length)return;
-  const neighborIds=new Set(neighbors.map(n=>n.id));
-  const nodeData=[{id:centerId,r:12,center:true},
-    ...neighbors.map(n=>({id:n.id,r:Math.min(4+n.w*.5,9),center:false,w:n.w}))];
-  // star 링크
+  const nodeData=[{id:centerId,r:13,center:true,pc:NM[centerId]?.paper_count||0},
+    ...neighbors.map(n=>({id:n.id,r:Math.min(5+n.w*.6,11),center:false,w:n.w,pc:NM[n.id]?.paper_count||0}))];
   const starLinks=neighbors.map(n=>({source:centerId,target:n.id,w:n.w,cross:false}));
-  // mesh 교차 링크 (이웃 ↔ 이웃, id1<id2 중복방지)
   const crossLinks=[];
   if(localMode==='mesh'){
     const nbArr=neighbors.map(n=>n.id);
@@ -1022,27 +1020,32 @@ function renderLocalGraph(centerId){
   }
   const linkData=[...starLinks,...crossLinks];
   const NS=d3.select(svgEl);
-  const link=NS.append('g').selectAll('line').data(linkData).join('line')
-    .attr('stroke',d=>d.cross?'#3a4a6e':'#252d48')
-    .attr('stroke-width',d=>d.cross?1:Math.min(d.w*.4+.8,3))
-    .attr('stroke-dasharray',d=>d.cross?'3,3':null);
-  const node=NS.append('g').selectAll('circle').data(nodeData).join('circle')
-    .attr('r',d=>d.r)
-    .attr('fill',d=>d.center?'#5b8dee':nc(NM[d.id]?.paper_count||1))
+  // zoom+pan
+  const g=NS.append('g');
+  NS.call(d3.zoom().scaleExtent([.5,4]).on('zoom',e=>g.attr('transform',e.transform)));
+  const link=g.append('g').selectAll('line').data(linkData).join('line')
+    .attr('stroke',d=>d.cross?'#3a4a6e':'#2e3a5e')
+    .attr('stroke-width',d=>d.cross?1:Math.min(d.w*.5+.8,3.5))
+    .attr('stroke-dasharray',d=>d.cross?'4,3':null).attr('stroke-opacity',d=>d.cross?.6:.9);
+  const node=g.append('g').selectAll('circle').data(nodeData).join('circle')
+    .attr('r',d=>d.r).attr('fill',d=>d.center?'#5b8dee':nc(d.pc||1))
     .attr('stroke','#090c14').attr('stroke-width',1.5)
-    .style('cursor',d=>d.center?'default':'pointer');
+    .style('cursor',d=>d.center?'default':'pointer')
+    .on('mouseenter',function(e,d){if(!d.center)d3.select(this).attr('stroke','#fff').attr('stroke-width',2.5);})
+    .on('mouseleave',function(e,d){d3.select(this).attr('stroke','#090c14').attr('stroke-width',1.5);});
   node.filter(d=>!d.center).on('click',(e,d)=>selectById(d.id));
-  node.append('title').text(d=>d.center?d.id:`${d.id} (공저 ${d.w||0}편)`);
-  const lbl=NS.append('g').selectAll('text').data(nodeData).join('text')
-    .text(d=>{const n=d.id;return n.length>3?n.slice(0,3)+'…':n;})
-    .attr('text-anchor','middle').attr('fill',d=>d.center?'#e2e8f8':'#7c89ae')
-    .attr('font-size',d=>d.center?10:9).attr('pointer-events','none')
-    .attr('dy',d=>d.r+11);
+  node.append('title').text(d=>d.center?`${d.id} (${d.pc}편)`:
+    `${d.id} (논문 ${d.pc}편 / 공저 ${d.w||0}편)`);
+  const lbl=g.append('g').selectAll('text').data(nodeData).join('text')
+    .text(d=>{const n=d.id;return n.length>4?n.slice(0,4)+'…':n;})
+    .attr('text-anchor','middle').attr('fill',d=>d.center?'#e2e8f8':'#8c9dc0')
+    .attr('font-size',d=>d.center?11:9.5).attr('pointer-events','none')
+    .attr('dy',d=>d.r+12);
   const sim=d3.forceSimulation(nodeData)
-    .force('link',d3.forceLink(linkData).id(d=>d.id).distance(d=>d.cross?42:52))
-    .force('charge',d3.forceManyBody().strength(localMode==='mesh'?-110:-90))
+    .force('link',d3.forceLink(linkData).id(d=>d.id).distance(d=>d.cross?50:62))
+    .force('charge',d3.forceManyBody().strength(localMode==='mesh'?-130:-100))
     .force('center',d3.forceCenter(W/2,H/2))
-    .force('collide',d3.forceCollide(d=>d.r+4));
+    .force('collide',d3.forceCollide(d=>d.r+5));
   sim.on('tick',()=>{
     const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
     link.attr('x1',d=>clamp(d.source.x,0,W)).attr('y1',d=>clamp(d.source.y,0,H))
@@ -1050,7 +1053,7 @@ function renderLocalGraph(centerId){
     node.attr('cx',d=>clamp(d.x,d.r,W-d.r)).attr('cy',d=>clamp(d.y,d.r,H-d.r));
     lbl.attr('x',d=>clamp(d.x,d.r,W-d.r)).attr('y',d=>clamp(d.y,d.r,H-d.r));
   });
-  setTimeout(()=>sim.stop(),localMode==='mesh'?3200:2500);
+  setTimeout(()=>sim.stop(),localMode==='mesh'?3500:2800);
 }
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');selId=null;draw();}
 function selectById(name){
@@ -1623,8 +1626,8 @@ function goToAuthor(name){
 }
 function zoomToNode(name){
   const n=NM[name]; if(!n||n.x==null)return;
-  const W=cvs.clientWidth||cvs.width, H=cvs.clientHeight||cvs.height;
-  const k=Math.min(W,H)/120;
+  const W=cvs.clientWidth||cvs.width||800, H=cvs.clientHeight||cvs.height||600;
+  const k=3;
   const tx=W/2-n.x*k, ty=H/2-n.y*k;
   d3.select(cvs).transition().duration(650).ease(d3.easeCubicInOut)
     .call(zb.transform, d3.zoomIdentity.translate(tx,ty).scale(k));
