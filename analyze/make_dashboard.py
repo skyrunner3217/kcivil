@@ -266,7 +266,7 @@ a.pi:hover,div.pi:hover{border-color:var(--ac);background:rgba(91,141,238,.06)}
 .kpi-d{font-size:11px;font-weight:600;margin-top:1px}
 .up{color:var(--gr)}.dn{color:var(--rd)}.flat{color:var(--t2)}
 /* Topic toggles */
-.topic-toggles{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.topic-toggles{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;height:90px;overflow-y:auto;align-content:flex-start;flex-shrink:0}
 .ttog{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;
       font-size:12px;cursor:pointer;border:1.5px solid;transition:all .15s;user-select:none}
 .ttog.off{opacity:.35}
@@ -565,20 +565,9 @@ td.num{color:var(--t2);text-align:right}
         '        <div class="cw" style="flex:1;min-height:180px"><canvas id="cyr"></canvas></div>'
         '      </div>'
         '    </div>'
-        # 2. 히트맵(좌) + 주제 트렌드(우) 나란히, 높이 통일
-        '    <div style="display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:stretch">'
-        # 히트맵 (좌)
-        '      <div class="card" style="display:flex;flex-direction:column">'
-        '        <div class="card-hd">'
-        '          <h3>🗓 주제 × 연도 히트맵</h3>'
-        '          <div class="tseg" id="hmgran">'
-        '            <div class="tseg-btn" data-v="year">연도별</div>'
-        '            <div class="tseg-btn on" data-v="5year">5년 단위</div>'
-        '          </div>'
-        '        </div>'
-        '        <div id="hmap-wrap" style="flex:1;overflow-x:auto;padding-bottom:4px"><div id="hmap"></div></div>'
-        '      </div>'
-        # 주제 트렌드 (우) — flex-column으로 캔버스가 남은 공간 채움
+        # 2. 주제 트렌드(좌) + 히트맵(우) 나란히, 높이 통일
+        '    <div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:stretch">'
+        # 주제 트렌드 (좌) — flex-column으로 캔버스가 남은 공간 채움
         '      <div class="card" style="display:flex;flex-direction:column;min-width:0">'
         '        <div class="card-hd">'
         '          <h3>📈 연구 주제 트렌드</h3>'
@@ -594,6 +583,17 @@ td.num{color:var(--t2);text-align:right}
         '        <div class="topic-toggles" id="topic-toggles"></div>'
         '        <div style="flex:1;min-height:200px;position:relative"><canvas id="ctopic" style="width:100%;height:100%"></canvas></div>'
         '        <p style="font-size:11px;color:var(--t3);margin-top:6px">※ 제목 키워드 기반 자동 분류 · 참고용</p>'
+        '      </div>'
+        # 히트맵 (우)
+        '      <div class="card" style="display:flex;flex-direction:column">'
+        '        <div class="card-hd">'
+        '          <h3>🗓 주제 × 연도 히트맵</h3>'
+        '          <div class="tseg" id="hmgran">'
+        '            <div class="tseg-btn" data-v="year">연도별</div>'
+        '            <div class="tseg-btn on" data-v="5year">5년 단위</div>'
+        '          </div>'
+        '        </div>'
+        '        <div id="hmap-wrap" style="flex:1;overflow-x:auto;padding-bottom:4px"><div id="hmap"></div></div>'
         '      </div>'
         '    </div>'
         # 3. 활동 저자 + 논문당 저자 수
